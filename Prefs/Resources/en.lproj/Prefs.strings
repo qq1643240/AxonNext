@@ -1,0 +1,90 @@
+{
+  "ENABLED_RESPRING" = "Enabled (Respring required)";
+  "VERTICAL" = "Vertical mode";
+  "VERTICAL_INFO" = "Rotates AxonNext by 90 deg, puts it to one of the sides and makes your notification smaller. Respring required. Experimental.";
+  "VERTICAL_RESPRING" = "Vertical (Respring required)";
+  "ENABLED" = "Enabled";
+  "HAPTIC_FEEDBACK" = "Haptic feedback";
+  "DARK_MODE" = "Dark mode";
+
+  "SYSTEM" = "System";
+  "LIGHT" = "Light";
+  "DARK" = "Dark";
+
+  "STYLE" = "Style";
+  "DEFAULT" = "Default";
+  "PACKED" = "Packed";
+  "COMPACT" = "Compact";
+  "TINY" = "Tiny";
+  "GROUP" = "Group (Beta, Respring required)";
+  "ROUNEDED_GROUP" = "Rounded Group (Beta, Respring required)";
+
+  "SHOW" = "Show by default";
+  "NOTHING" = "Nothing";
+  "LATEST_NOTIFICATION" = "Latest notification";
+  "FIRST_SECTION" = "First section";
+  "SELECTED_SECTION" = "Selected section";
+
+  "SORTING" = "Sorting";
+  "BY_DATE" = "Latest";
+  "BY_NAME" = "By app name";
+  "BY_COUNT" = "By count";
+
+  "ICON_STYLE" = "Icon style";
+  "ROUNDED" = "Rounded";
+  "SQUARE" = "Square";
+
+  "SELECTION_STYLE" = "Selection style";
+  "BACKGROUND" = "Add background";
+  "DIM" = "Dim others";
+  "NONE" = "None";
+
+  "ADD_BLUR" = "Add Blur";
+
+  "LOCATION" = "Location";
+  "TOP" = "Top";
+  "BOTTOM" = "Bottom (Beta)";
+
+  "BADGES" = "Badges";
+  "SHOW_BACKGROUND" = "Show background";
+
+  "SPACING" = "Spacing";
+
+  "ALIGNMENT" = "Alignment";
+  "LEFT" = "Left";
+  "CENTER" = "Center";
+  "RIGHT" = "Right";
+
+  "GESTURES" = "Gestures";
+  "GESTURES_INFO" = "Assign actions to swipe gestures on the AxonNext view.";
+  "SWIPE_UP" = "Swipe Up";
+  "SWIPE_DOWN" = "Swipe Down";
+  "SWIPE_LEFT" = "Swipe Left";
+  "SWIPE_RIGHT" = "Swipe Right";
+  "CLEAR_ALL" = "Clear All Notifications";
+  "DISMISS" = "Dismiss Notification Center";
+  "CLEAR_SELECTED" = "Clear Selected App";
+  "TOGGLE_HISTORY" = "Toggle Notification History";
+  "OPEN_APP" = "Open App";
+  "MUTE_NOTIFICATIONS" = "Mute Notifications";
+  "PIN_APP" = "Pin App";
+  "VIEW_NOTIFICATIONS" = "View Notifications";
+
+  "ANIMATION" = "Animation";
+  "ANIMATION_INFO" = "Choose animation effect for the AxonNext view.";
+  "ANIM_SPRING" = "Apple Spring";
+  "ANIM_SCALE" = "Scale";
+  "ANIM_BOUNCE" = "Bounce";
+  "ANIM_FLUID" = "Fluid";
+  "ANIM_JELLY" = "Jelly";
+  "ANIM_FADE" = "Fade";
+
+  "LONG_PRESS_MENU" = "Long Press Menu";
+  "LONG_PRESS_MENU_INFO" = "Configure actions available in the long press menu.";
+
+  "RESPRING" = "Respring";
+  "DEBUG" = "Debug options";
+  "SOURCE_CODE" = "Source code";
+  "DONATE_TO_NEPETA" = "Donate to Nepeta";
+  "SUPPORT_ME" = "Support me!";
+}

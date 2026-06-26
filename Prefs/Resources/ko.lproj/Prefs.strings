@@ -1,0 +1,93 @@
+{
+  "ENABLED_RESPRING" = "활성화 (리스프링 필요)";
+  "VERTICAL" = "수직 모드";
+  "VERTICAL_INFO" = "AxonNext을 90도 회전시킵니다. 알림의 한쪽이 작게 보이게 됩니다. 리스프링 필요. 실험적 기능.";
+  "VERTICAL_RESPRING" = "수직 모드 (리스프링 필요)";
+  "ENABLED" = "활성화";
+  "HAPTIC_FEEDBACK" = "햅틱 피드백";
+  "DARK_MODE" = "다크 모드";
+  
+  "SYSTEM" = "시스템";
+  "LIGHT" = "라이트";
+  "DARK" = "다크";
+
+  "STYLE" = "스타일";
+  "DEFAULT" = "기본";
+  "PACKED" = "압축된";
+  "COMPACT" = "컴팩트";
+  "TINY" = "작은";
+  "GROUP" = "그룹 (베타, 리스프링 필요)";
+  "ROUNEDED_GROUP" = "동그란 그룹 (베타, 리스프링 필요)";
+
+  "SHOW" = "기본으로 표시";
+  "NOTHING" = "안함";
+  "LATEST_NOTIFICATION" = "마지막 알림";
+  "FIRST_SECTION" = "첫 섹션";
+  "SELECTED_SECTION" = "선택된 섹션";
+
+  "SORTING" = "정렬";
+  "BY_DATE" = "최신순";
+  "BY_NAME" = "앱 이름순";
+  "BY_COUNT" = "갯수순";
+
+  "ICON_STYLE" = "아이콘 스타일";
+  "ROUNDED" = "둥글게";
+  "SQUARE" = "각지게";
+
+  "SELECTION_STYLE" = "선택 스타일";
+  "BACKGROUND" = "배경 추가";
+  "DIM" = "다른것 어둡게";
+  "NONE" = "없음";
+
+  "ADD_BLUR" = "흐림 효과 추가";
+
+  "LOCATION" = "위치";
+  "TOP" = "위";
+  "BOTTOM" = "아래 (베타)";
+
+  "BADGES" = "뱃지";
+  "SHOW_BACKGROUND" = "배경 보이기";
+
+  "SPACING" = "간격";
+
+  "ALIGNMENT" = "정렬";
+  "LEFT" = "왼쪽";
+  "CENTER" = "중앙";
+  "RIGHT" = "오른쪽";
+
+  "GESTURES" = "제스처";
+  "GESTURES_INFO" = "AxonNext 뷰에서 스와이프 제스처에 동작을 할당합니다.";
+  "SWIPE_UP" = "위로 스와이프";
+  "SWIPE_DOWN" = "아래로 스와이프";
+  "SWIPE_LEFT" = "왼쪽으로 스와이프";
+  "SWIPE_RIGHT" = "오른쪽으로 스와이프";
+  "CLEAR_ALL" = "모든 알림 지우기";
+  "DISMISS" = "알림 센터 닫기";
+  "CLEAR_SELECTED" = "선택한 앱 지우기";
+  "TOGGLE_HISTORY" = "알림 기록 토글";
+  "OPEN_APP" = "앱 열기";
+  "MUTE_NOTIFICATIONS" = "알림 음소거";
+  "PIN_APP" = "앱 고정";
+  "VIEW_NOTIFICATIONS" = "알림 보기";
+
+  "ANIMATION" = "애니메이션";
+  "ANIMATION_INFO" = "AxonNext 뷰에 대한 애니메이션 효과를 선택합니다.";
+  "ANIM_SPRING" = "Apple 스프링";
+  "ANIM_SCALE" = "스케일";
+  "ANIM_BOUNCE" = "바운스";
+  "ANIM_FLUID" = "플루이드";
+  "ANIM_JELLY" = "젤리";
+  "ANIM_FADE" = "페이드";
+
+  "LONG_PRESS_MENU" = "긴 터치 메뉴";
+  "LONG_PRESS_MENU_INFO" = "긴 터치 메뉴에서 사용 가능한 동작을 구성합니다.";
+
+  "CREDITS_1" = "Ahmed Bousrih";
+  "CREDITS_1_INFO" = "아이콘과 배너 디자인";
+
+  "RESPRING" = "리스프링";
+  "DEBUG" = "디버그 옵션";
+  "SOURCE_CODE" = "소스 코드";
+  "DONATE_TO_NEPETA" = "Nepeta에게 후원";
+  "SUPPORT_ME" = "저를 지원해주세요!";
+}

@@ -1,0 +1,176 @@
+name: Build AxonNext
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build-rootless:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Theos
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git curl wget perl clang lld llvm \
+            libxml2-dev libssl-dev zlib1g-dev dpkg-dev unzip xz-utils \
+            libbz2-dev liblzma-dev fakeroot rsync sed grep lzma-dev
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+          
+      - name: Install iOS SDK
+        run: |
+          set -e
+          cd $THEOS/sdks
+          echo "Current SDKs:"
+          ls -la
+          if [ -z "$(ls -A *.sdk 2>/dev/null)" ]; then
+            echo "No SDKs found, cloning..."
+            git clone --depth 1 https://github.com/theos/sdks.git tmp_sdks
+            mv tmp_sdks/*.sdk .
+            rm -rf tmp_sdks
+          fi
+          echo "Final SDKs:"
+          ls -la
+          
+      - name: Build Package (Rootless)
+        run: |
+          echo "THEOS=$THEOS"
+          echo "HOME=$HOME"
+          ls -la $THEOS/
+          make clean THEOS="$THEOS"
+          THEOS_PACKAGE_SCHEME=rootless make package FINALPACKAGE=1 THEOS="$THEOS" 2>&1 | tee build-rootless.log
+          echo "Build complete, listing all files:"
+          echo "=== Current directory ===" 
+          pwd
+          ls -la
+          echo "=== packages directory ===" 
+          ls -la packages/ 2>/dev/null || echo "packages directory not found"
+          echo "=== .theos/packages directory ===" 
+          ls -la .theos/packages/ 2>/dev/null || echo ".theos/packages directory not found"
+          echo "=== Finding all deb files ===" 
+          find . -name "*.deb" -type f 2>/dev/null
+          
+      - name: Print build log on failure
+        if: always()
+        run: |
+          echo "## Build Log" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build-rootless.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+      - name: Upload debug files
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-files-rootless
+          path: |
+            build-rootless.log
+            
+      - name: Upload Artifact (Rootless)
+        uses: actions/upload-artifact@v4
+        with:
+          name: AxonNext-rootless-deb
+          path: |
+            packages/*.deb
+            .theos/packages/*.deb
+
+  build-roothide:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Theos
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git curl wget perl clang lld llvm \
+            libxml2-dev libssl-dev zlib1g-dev dpkg-dev unzip xz-utils \
+            libbz2-dev liblzma-dev fakeroot rsync sed grep lzma-dev
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+          
+      - name: Install iOS SDK
+        run: |
+          set -e
+          cd $THEOS/sdks
+          echo "Current SDKs:"
+          ls -la
+          if [ -z "$(ls -A *.sdk 2>/dev/null)" ]; then
+            echo "No SDKs found, cloning..."
+            git clone --depth 1 https://github.com/theos/sdks.git tmp_sdks
+            mv tmp_sdks/*.sdk .
+            rm -rf tmp_sdks
+          fi
+          echo "Final SDKs:"
+          ls -la
+          
+      - name: Build Package (RootHide)
+        run: |
+          echo "THEOS=$THEOS"
+          echo "HOME=$HOME"
+          ls -la $THEOS/
+          make clean THEOS="$THEOS"
+          THEOS_PACKAGE_SCHEME=rootless make package FINALPACKAGE=1 THEOS="$THEOS" 2>&1 | tee build-roothide.log
+          echo "Build complete, listing all files:"
+          echo "=== Current directory ===" 
+          pwd
+          ls -la
+          echo "=== packages directory ===" 
+          ls -la packages/ 2>/dev/null || echo "packages directory not found"
+          echo "=== .theos/packages directory ===" 
+          ls -la .theos/packages/ 2>/dev/null || echo ".theos/packages directory not found"
+          echo "=== Finding all deb files ===" 
+          find . -name "*.deb" -type f 2>/dev/null
+          
+      - name: Print build log on failure
+        if: always()
+        run: |
+          echo "## Build Log" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build-roothide.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+      - name: Upload debug files
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-files-roothide
+          path: |
+            build-roothide.log
+            
+      - name: Upload Artifact (RootHide)
+        uses: actions/upload-artifact@v4
+        with:
+          name: AxonNext-roothide-deb
+          path: |
+            packages/*.deb
+            .theos/packages/*.deb
+          
+      - name: List packages
+        run: |
+          ls -la packages/
+          echo "DEB files:"
+          ls packages/*.deb
+          
+      - name: Create Release
+        if: github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v2.0-${{ github.run_number }}
+          name: AxonNext v2.0 Build #${{ github.run_number }}
+          body: AxonNext v2.0 Build from commit ${{ github.sha }}
+          files: |
+            packages/*.deb
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
