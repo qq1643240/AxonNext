@@ -197,11 +197,18 @@ UIView *getBlurView(CGRect frame) {
     if (self.bundleIdentifier) {
         Class lsAppClass = NSClassFromString(@"LSApplicationWorkspace");
         if (lsAppClass) {
-            SEL selector = NSSelectorFromString(@"sharedWorkspace");
-            if ([lsAppClass respondsToSelector:selector]) {
-                id workspace = [lsAppClass performSelector:selector];
-                if (workspace && [workspace respondsToSelector:@selector(openApplicationWithBundleIdentifier:)]) {
-                    [workspace openApplicationWithBundleIdentifier:self.bundleIdentifier];
+            SEL sharedSelector = NSSelectorFromString(@"sharedWorkspace");
+            if ([lsAppClass respondsToSelector:sharedSelector]) {
+                IMP sharedImp = [lsAppClass methodForSelector:sharedSelector];
+                id (*sharedFunc)(Class, SEL) = (void *)sharedImp;
+                id workspace = sharedFunc(lsAppClass, sharedSelector);
+                if (workspace) {
+                    SEL openSelector = NSSelectorFromString(@"openApplicationWithBundleIdentifier:");
+                    if ([workspace respondsToSelector:openSelector]) {
+                        IMP openImp = [workspace methodForSelector:openSelector];
+                        void (*openFunc)(id, SEL, NSString *) = (void *)openImp;
+                        openFunc(workspace, openSelector, self.bundleIdentifier);
+                    }
                 }
             }
         }
@@ -222,8 +229,11 @@ UIView *getBlurView(CGRect frame) {
         NSArray *requests = [[AXNManager sharedInstance] requestsForBundleIdentifier:self.bundleIdentifier];
         if ([requests count] > 0) {
             NCNotificationRequest *req = requests[0];
-            if (req.content && req.content.text) {
-                [[UIPasteboard generalPasteboard] setString:req.content.text];
+            if (req.content && [req.content respondsToSelector:@selector(body)]) {
+                NSString *body = [req.content performSelector:@selector(body)];
+                if (body) {
+                    [[UIPasteboard generalPasteboard] setString:body];
+                }
             }
         }
     }
@@ -259,61 +269,43 @@ UIView *getBlurView(CGRect frame) {
     if (sender.state == UIGestureRecognizerStateBegan) {
         AudioServicesPlaySystemSound(1519);
 
-        float version = [[[UIDevice currentDevice] systemVersion] floatValue];
+        NSString *appName = [self getAppName] ?: @"App";
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:appName message:nil preferredStyle:UIAlertControllerStyleActionSheet];
 
-        if(version >= 13) {
-          NSString *appName = [self getAppName] ?: @"App";
-          UIAlertController *alert = [UIAlertController alertControllerWithTitle:appName message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        [alert addAction:[UIAlertAction actionWithTitle:@"打开应用" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [self axnOpenApp];
+        }]];
 
-          [alert addAction:[UIAlertAction actionWithTitle:@"打开应用" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-              [self axnOpenApp];
-          }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"查看通知" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [self axnViewNotifications];
+        }]];
 
-          [alert addAction:[UIAlertAction actionWithTitle:@"查看通知" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-              [self axnViewNotifications];
-          }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"复制通知内容" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [self axnCopyNotificationContent];
+        }]];
 
-          [alert addAction:[UIAlertAction actionWithTitle:@"复制通知内容" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-              [self axnCopyNotificationContent];
-          }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"静音通知" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [self axnMuteNotifications];
+        }]];
 
-          [alert addAction:[UIAlertAction actionWithTitle:@"静音通知" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-              [self axnMuteNotifications];
-          }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"收藏" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [self axnFavorite];
+        }]];
 
-          [alert addAction:[UIAlertAction actionWithTitle:@"收藏" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-              [self axnFavorite];
-          }]];
+        [alert addAction:[UIAlertAction actionWithTitle:[NSString stringWithFormat:@"清除 %@ 通知", appName] style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+            [self axnClearAll];
+        }]];
 
-          [alert addAction:[UIAlertAction actionWithTitle:[NSString stringWithFormat:@"清除 %@ 通知", appName] style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-              [self axnClearAll];
-          }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"清除所有通知" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+            [self axnRealClearAll];
+        }]];
 
-          [alert addAction:[UIAlertAction actionWithTitle:@"清除所有通知" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-              [self axnRealClearAll];
-          }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        }]];
 
-          [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-          }]];
-
-          UIResponder *responder = self;
-          while ([responder isKindOfClass:[UIView class]]) responder = [responder nextResponder];
-          [(UIViewController *)responder presentViewController:alert animated:YES completion:nil];
-        } else {
-          [self becomeFirstResponder];
-          UIMenuController *menu = [UIMenuController sharedMenuController];
-          menu.menuItems = @[
-              [[UIMenuItem alloc] initWithTitle:@"打开应用" action:@selector(axnOpenApp)],
-              [[UIMenuItem alloc] initWithTitle:@"查看通知" action:@selector(axnViewNotifications)],
-              [[UIMenuItem alloc] initWithTitle:@"复制通知" action:@selector(axnCopyNotificationContent)],
-              [[UIMenuItem alloc] initWithTitle:@"静音" action:@selector(axnMuteNotifications)],
-              [[UIMenuItem alloc] initWithTitle:@"收藏" action:@selector(axnFavorite)],
-              [[UIMenuItem alloc] initWithTitle:@"清除通知" action:@selector(axnClearAll)],
-              [[UIMenuItem alloc] initWithTitle:@"清除所有" action:@selector(axnRealClearAll)]
-          ];
-          [menu setTargetRect:self.bounds inView:self];
-          [menu setMenuVisible:YES animated:YES];
-        }
+        UIResponder *responder = self;
+        while ([responder isKindOfClass:[UIView class]]) responder = [responder nextResponder];
+        [(UIViewController *)responder presentViewController:alert animated:YES completion:nil];
     }
 }
 

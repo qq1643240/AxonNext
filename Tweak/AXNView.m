@@ -183,13 +183,18 @@
     if (self.selectedBundleIdentifier) {
         Class lsAppClass = NSClassFromString(@"LSApplicationWorkspace");
         if (lsAppClass) {
-            SEL selector = NSSelectorFromString(@"sharedWorkspace");
-            if ([lsAppClass respondsToSelector:selector]) {
-                id workspace = [lsAppClass performSelector:selector];
-                if (workspace && [workspace respondsToSelector:@selector(openApplicationWithBundleIdentifier:options:additionalSLOSchema:sender:)]) {
-                    [workspace openApplicationWithBundleIdentifier:self.selectedBundleIdentifier options:@{} additionalSLOSchema:nil sender:nil];
-                } else if (workspace && [workspace respondsToSelector:@selector(openApplicationWithBundleIdentifier:)]) {
-                    [workspace openApplicationWithBundleIdentifier:self.selectedBundleIdentifier];
+            SEL sharedSelector = NSSelectorFromString(@"sharedWorkspace");
+            if ([lsAppClass respondsToSelector:sharedSelector]) {
+                IMP sharedImp = [lsAppClass methodForSelector:sharedSelector];
+                id (*sharedFunc)(Class, SEL) = (void *)sharedImp;
+                id workspace = sharedFunc(lsAppClass, sharedSelector);
+                if (workspace) {
+                    SEL openSelector = NSSelectorFromString(@"openApplicationWithBundleIdentifier:");
+                    if ([workspace respondsToSelector:openSelector]) {
+                        IMP openImp = [workspace methodForSelector:openSelector];
+                        void (*openFunc)(id, SEL, NSString *) = (void *)openImp;
+                        openFunc(workspace, openSelector, self.selectedBundleIdentifier);
+                    }
                 }
             }
         }
