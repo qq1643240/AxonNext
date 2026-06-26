@@ -1,0 +1,77 @@
+{
+  "ENABLED_RESPRING" = "Enabled (Respring required)";
+  "VERTICAL" = "Vertical mode";
+  "VERTICAL_INFO" = "Rotates AxonNext by 90 deg, puts it to one of the sides and makes your notification smaller. Respring required. Experimental.";
+  "VERTICAL_RESPRING" = "Vertical (Respring required)";
+  "ENABLED" = "Enabled";
+  "HAPTIC_FEEDBACK" = "Haptic feedback";
+  "DARK_MODE" = "Dark mode";
+
+  "SYSTEM" = "System";
+  "LIGHT" = "Light";
+  "DARK" = "Dark";
+  "BLUR" = "Blur";
+  "TRANSPARENT" = "Transparent";
+
+  "STYLE" = "Style";
+  "DEFAULT" = "Default";
+  "PACKED" = "Packed";
+  "COMPACT" = "Compact";
+  "TINY" = "Tiny";
+  "GROUP" = "Group (Beta, Respring required)";
+  "ROUNEDED_GROUP" = "Rounded Group (Beta, Respring required)";
+
+  "SHOW" = "Show by default";
+  "NOTHING" = "Nothing";
+  "LATEST_NOTIFICATION" = "Latest notification";
+  "FIRST_SECTION" = "First section";
+  "SELECTED_SECTION" = "Selected section";
+
+  "SORTING" = "Sorting";
+  "BY_DATE" = "By date";
+  "BY_COUNT" = "By count";
+  "BY_NAME" = "By name";
+
+  "ICON_STYLE" = "Icon style";
+  "ROUNDED" = "Rounded";
+  "SQUARE" = "Square";
+
+  "SELECTION_STYLE" = "Selection style";
+  "BACKGROUND" = "Add background";
+  "DIM" = "Dim others";
+  "NONE" = "None";
+
+  "ADD_BLUR" = "Add Blur";
+
+  "LOCATION" = "Location";
+  "TOP" = "Top";
+  "BOTTOM" = "Bottom (Beta)";
+
+  "BADGES" = "Badges";
+  "SHOW_BACKGROUND" = "Show background";
+
+  "SPACING" = "Spacing";
+
+  "ALIGNMENT" = "Alignment";
+  "LEFT" = "Left";
+  "CENTER" = "Center";
+  "RIGHT" = "Right";
+
+  "LAYOUT" = "Layout";
+  "LAYOUT_SETTINGS" = "Layout Settings";
+  "ANIMATION" = "Animation";
+  "ANIMATION_SETTINGS" = "Animation Settings";
+  "GESTURES" = "Gestures";
+  "GESTURE_SETTINGS" = "Gesture Settings";
+  "FILTER" = "Notification Filter";
+  "FILTER_SETTINGS" = "Whitelist/Blacklist Settings";
+
+  "CREDITS_1" = "Ahmed Bousrih";
+  "CREDITS_1_INFO" = "Designed the icon and banners.";
+
+  "RESPRING" = "Respring";
+  "DEBUG" = "Debug options";
+  "SOURCE_CODE" = "Source code";
+  "DONATE_TO_NEPETA" = "Donate to Nepeta";
+  "SUPPORT_ME" = "Support me!";
+}

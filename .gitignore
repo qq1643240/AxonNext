@@ -1,0 +1,21 @@
+# Theos build artifacts
+obj/
+packages/
+.theos/
+*.deb
+*.ipa
+
+# Build intermediates
+*.o
+*.dylib
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~
+
+# Theos cache
+.theos_packages/

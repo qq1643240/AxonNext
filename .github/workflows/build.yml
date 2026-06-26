@@ -1,0 +1,127 @@
+name: Build AxonNext
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  THEOS: /opt/theos
+
+jobs:
+  build:
+    name: Build AxonNext (${{ matrix.scheme }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        scheme: [rootless, roothide]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential fakeroot dpkg-dev ldid perl \
+            rsync curl wget git unzip
+
+      - name: Cache Theos
+        uses: actions/cache@v4
+        id: cache-theos
+        with:
+          path: /opt/theos
+          key: theos-${{ runner.os }}-${{ hashFiles('.github/workflows/build.yml') }}
+
+      - name: Install Theos
+        if: steps.cache-theos.outputs.cache-hit != 'true'
+        run: |
+          sudo mkdir -p /opt/theos
+          sudo chown -R $USER /opt/theos
+          git clone --recursive https://github.com/theos/theos.git /opt/theos
+
+      - name: Setup Theos environment
+        run: |
+          echo "THEOS=/opt/theos" >> $GITHUB_ENV
+          echo "THEOS_PACKAGE_SCHEME=${{ matrix.scheme }}" >> $GITHUB_ENV
+          ls -la /opt/theos/makefiles/ | head -20
+
+      - name: Build Tweak
+        run: |
+          cd ${{ github.workspace }}
+          make clean || true
+          make package THEOS_PACKAGE_SCHEME=${{ matrix.scheme }} FINALPACKAGE=1
+
+      - name: List built packages
+        run: |
+          echo "=== Built packages ==="
+          ls -la packages/ || echo "No packages directory found"
+          find . -name "*.deb" -type f
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AxonNext-${{ matrix.scheme }}
+          path: |
+            packages/*.deb
+          if-no-files-found: error
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: |
+          echo "=== Downloaded artifacts ==="
+          find artifacts -type f
+          mkdir -p release
+          cp artifacts/AxonNext-rootless/*.deb release/AxonNext_rootless.deb 2>/dev/null || true
+          cp artifacts/AxonNext-roothide/*.deb release/AxonNext_roothide.deb 2>/dev/null || true
+          ls -la release/
+
+      - name: Create or Update Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2.0-${{ github.sha }}
+          name: AxonNext v2.0
+          body: |
+            # AxonNext v2.0
+
+            ## 支持的越狱环境
+            - Dopamine Rootless (iOS 14-16.5)
+            - RootHide Bootstrap (iOS 14-16.5)
+            - palera1n Rootless (iOS 14-16.5)
+
+            ## 安装包
+            - `AxonNext_rootless.deb` - Rootless 版本
+            - `AxonNext_roothide.deb` - Roothide 版本
+
+            ## 功能特性
+            - 四方向手势（上滑/下滑/左滑/右滑）
+            - 长按菜单（打开应用/查看通知/清除/收藏/复制等）
+            - 全中文设置界面
+            - 黑白名单过滤
+            - 自定义布局（图标大小/间距/每行数量/圆角）
+            - 6种动画效果
+            - 通知角标
+            - 深色/浅色/毛玻璃/透明外观
+          files: |
+            release/*.deb
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,77 @@
+{
+  "ENABLED_RESPRING" = "已启用（需要注销）";
+  "VERTICAL" = "垂直模式";
+  "VERTICAL_INFO" = "将 AxonNext 旋转 90 度，放在一侧，使通知变小。需要注销。实验性功能。";
+  "VERTICAL_RESPRING" = "垂直模式（需要注销）";
+  "ENABLED" = "启用";
+  "HAPTIC_FEEDBACK" = "触感反馈";
+  "DARK_MODE" = "深色模式";
+
+  "SYSTEM" = "跟随系统";
+  "LIGHT" = "浅色";
+  "DARK" = "深色";
+  "BLUR" = "毛玻璃";
+  "TRANSPARENT" = "透明";
+
+  "STYLE" = "样式";
+  "DEFAULT" = "默认";
+  "PACKED" = "紧凑";
+  "COMPACT" = "迷你";
+  "TINY" = "微型";
+  "GROUP" = "分组（测试中，需要注销）";
+  "ROUNEDED_GROUP" = "圆角分组（测试中，需要注销）";
+
+  "SHOW" = "默认显示";
+  "NOTHING" = "无";
+  "LATEST_NOTIFICATION" = "最新通知";
+  "FIRST_SECTION" = "第一个分组";
+  "SELECTED_SECTION" = "选中的分组";
+
+  "SORTING" = "排序方式";
+  "BY_DATE" = "按时间";
+  "BY_COUNT" = "按数量";
+  "BY_NAME" = "按名称";
+
+  "ICON_STYLE" = "图标样式";
+  "ROUNDED" = "圆角";
+  "SQUARE" = "方形";
+
+  "SELECTION_STYLE" = "选中样式";
+  "BACKGROUND" = "添加背景";
+  "DIM" = "淡化其他";
+  "NONE" = "无";
+
+  "ADD_BLUR" = "添加模糊";
+
+  "LOCATION" = "位置";
+  "TOP" = "顶部";
+  "BOTTOM" = "底部（测试中）";
+
+  "BADGES" = "角标";
+  "SHOW_BACKGROUND" = "显示背景";
+
+  "SPACING" = "间距";
+
+  "ALIGNMENT" = "对齐方式";
+  "LEFT" = "左对齐";
+  "CENTER" = "居中";
+  "RIGHT" = "右对齐";
+
+  "LAYOUT" = "布局";
+  "LAYOUT_SETTINGS" = "布局设置";
+  "ANIMATION" = "动画";
+  "ANIMATION_SETTINGS" = "动画设置";
+  "GESTURES" = "手势";
+  "GESTURE_SETTINGS" = "手势设置";
+  "FILTER" = "通知过滤";
+  "FILTER_SETTINGS" = "黑白名单设置";
+
+  "CREDITS_1" = "Ahmed Bousrih";
+  "CREDITS_1_INFO" = "设计了图标和横幅。";
+
+  "RESPRING" = "注销";
+  "DEBUG" = "调试选项";
+  "SOURCE_CODE" = "源代码";
+  "DONATE_TO_NEPETA" = "赞助 Nepeta";
+  "SUPPORT_ME" = "支持作者！";
+}
