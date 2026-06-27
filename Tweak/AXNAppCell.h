@@ -1,3 +1,8 @@
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
+#import "RandomHeaders.h"
+
 @interface MPArtworkColorAnalyzer : NSObject
 - (void)analyzeWithCompletionHandler:(id /* block */)arg1;
 - (id)initWithImage:(id)arg1 algorithm:(long long)arg2;
@@ -29,42 +34,6 @@ typedef NS_OPTIONS(NSUInteger, MTMaterialOptions) {
 + (instancetype)materialViewWithRecipe:(MTMaterialRecipe)recipe configuration:(NSInteger)config;
 @end
 
-@interface NCNotificationDispatcher : NSObject
-@property (nonatomic, retain) id notificationStore;
--(void)destination:(id)arg1 requestsClearingNotificationRequests:(id)arg2;
-@end
-
-@interface NCNotificationRequest : NSObject <NSCopying>
-@property (nonatomic, copy) NSString *notificationIdentifier;
-@property (nonatomic, retain) NSDate *timestamp;
-@property (nonatomic, retain) BBBulletin *bulletin;
-@property (nonatomic, retain) NCNotificationContent *content;
-@property (nonatomic, retain) NSString *sectionIdentifier;
-@end
-
-@interface NCCoalescedNotification : NSObject
-@property (nonatomic, retain) NSSet *notificationRequests;
-@end
-
-@interface SBIcon : NSObject
-- (UIImage *)getIconImage:(NSInteger)arg1;
-- (UIImage *)iconImageWithInfo:(struct SBIconImageInfo)arg1;
-@end
-
-@interface SBIconModel : NSObject
-- (SBIcon *)applicationIconForBundleIdentifier:(NSString *)arg1;
-@end
-
-@interface SBIconViewMap : NSObject
-- (SBIconModel *)iconModel;
-@end
-
-@interface SBIconController : NSObject
-+ (instancetype)sharedInstance;
-- (SBIconViewMap *)homescreenIconViewMap;
-- (SBIconModel *)model;
-@end
-
 @interface NCNotificationStructuredListViewController : UIViewController
 @property (nonatomic, retain) NSMutableSet *internalNotificationRequests;
 - (NSSet *)allNotificationRequests;
@@ -79,23 +48,6 @@ typedef NS_OPTIONS(NSUInteger, MTMaterialOptions) {
 - (id)collectionView;
 - (BOOL)isPresentingContent;
 - (void)_setListHasContent:(BOOL)arg1;
-@end
-
-@interface UIImage (Private)
-+ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(CGFloat)scale;
-@end
-
-@interface CALayer (Private)
-@property (nonatomic, assign) BOOL continuousCorners;
-@end
-
-@interface SBApplicationController : NSObject
-+(id)sharedInstance;
--(id)applicationWithBundleIdentifier:(id)arg1;
-@end
-
-@interface SBApplication : NSObject
-@property (nonatomic,readonly) NSString * displayName;
 @end
 
 // Gesture action enum

@@ -143,7 +143,7 @@ static void axn_animateWithStyle(NSInteger style, void (^animations)(void)) {
     axn_animateWithStyle(self.animationStyle, ^{
         [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
     });
-    [[AXNManager sharedInstance] revealNotificationHistory:false];
+    [[AXNManager sharedInstance] revealNotificationHistory:NO];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {

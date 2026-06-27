@@ -28,15 +28,15 @@
 
 @end
 
-@interface NCNotificationRequest : NSObject
+@interface NCNotificationRequest : NSObject <NSCopying>
 
-@property (nonatomic,readonly) NCNotificationContent * content;
-@property (nonatomic,copy,readonly) NSString * sectionIdentifier;
-@property (nonatomic,copy,readonly) NSString * notificationIdentifier;
-@property (nonatomic,copy,readonly) NSString * threadIdentifier;
-@property (nonatomic,copy,readonly) NSString * categoryIdentifier;
-@property (nonatomic,readonly) BBBulletin * bulletin;
-@property (nonatomic,readonly) NSDate * timestamp;
+@property (nonatomic, retain) NCNotificationContent *content;
+@property (nonatomic, retain) NSString *sectionIdentifier;
+@property (nonatomic, copy) NSString *notificationIdentifier;
+@property (nonatomic, copy) NSString *threadIdentifier;
+@property (nonatomic, copy) NSString *categoryIdentifier;
+@property (nonatomic, retain) BBBulletin *bulletin;
+@property (nonatomic, retain) NSDate *timestamp;
 
 @end
 
@@ -51,23 +51,23 @@
 @property (nonatomic, assign) BOOL axnAllowChanges;
 -(id)allNotificationRequests;
 -(id)axnNotificationRequests;
--(bool)insertNotificationRequest:(id)arg1 forCoalescedNotification:(id)arg2 ;
+-(BOOL)insertNotificationRequest:(id)arg1 forCoalescedNotification:(id)arg2 ;
 -(void)removeNotificationRequest:(id)arg1 forCoalescedNotification:(id)arg2 ;
--(bool)modifyNotificationRequest:(id)arg1 forCoalescedNotification:(id)arg2 ;
+-(BOOL)modifyNotificationRequest:(id)arg1 forCoalescedNotification:(id)arg2 ;
 -(void)insertNotificationRequestIntoRecentsSection:(id)arg1 forCoalescedNotification:(id)arg2 ;
--(void)_performNotificationHistorySectionOperation:(/*^block*/ id)arg1 animated:(bool)arg2 delayAnimation:(bool)arg3 ;
+-(void)_performNotificationHistorySectionOperation:(/*^block*/ id)arg1 animated:(BOOL)arg2 delayAnimation:(BOOL)arg3 ;
 -(void)removeNotificationRequestFromRecentsSection:(id)arg1 forCoalescedNotification:(id)arg2 ;
--(void)forceNotificationHistoryRevealed:(bool)arg1 animated:(bool)arg2 ;
+-(void)forceNotificationHistoryRevealed:(BOOL)arg1 animated:(BOOL)arg2 ;
 -(void)_revealNotificationsHistory;
--(void)setShouldAllowNotificationsHistoryReveal:(bool)arg1 ;
--(void)_setShowingNotificationsHistory:(bool)arg1 animated:(bool)arg2 ;
--(void)_setShowingNotificationsHistory:(bool)arg1 ;
--(bool)shouldAllowNotificationsHistoryReveal;
--(void)setDidPlayRevealHaptic:(bool)arg1 ;
--(void)setNotificationHistorySectionNeedsReload:(bool)arg1 ;
+-(void)setShouldAllowNotificationsHistoryReveal:(BOOL)arg1 ;
+-(void)_setShowingNotificationsHistory:(BOOL)arg1 animated:(BOOL)arg2 ;
+-(void)_setShowingNotificationsHistory:(BOOL)arg1 ;
+-(BOOL)shouldAllowNotificationsHistoryReveal;
+-(void)setDidPlayRevealHaptic:(BOOL)arg1 ;
+-(void)setNotificationHistorySectionNeedsReload:(BOOL)arg1 ;
 -(void)_reloadNotificationHistorySectionIfNecessary;
 -(id)_coalescingIdentifierForNotificationRequest:(id)arg1 ;
--(bool)hasContent;
+-(BOOL)hasContent;
 -(void)clearAllCoalescingControlsCells;
 -(void)clearAll;
 -(UICollectionView*)collectionView;
@@ -77,7 +77,7 @@
 
 @interface SBDashBoardCombinedListViewController : UIViewController
 -(void)_setListHasContent:(BOOL)arg1;
--(bool)hasContent;
+-(BOOL)hasContent;
 @end
 
 @interface NCNotificationStore : NSObject

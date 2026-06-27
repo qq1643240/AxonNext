@@ -407,7 +407,7 @@
 -(void)showNotificationRequest:(NCNotificationRequest *)req {
     if (!req) return;
     self.clvc.axnAllowChanges = YES;
-    if ([self.clvc respondsToSelector:@selector(insertNotificationRequest:forCoalescedNotification:)]) [self.clvc insertNotificationRequest:req forCoalescedNotification:[self coalescedNotificationForRequest:req]];
+    if ([(id)self.clvc respondsToSelector:@selector(insertNotificationRequest:forCoalescedNotification:)]) [self.clvc insertNotificationRequest:req forCoalescedNotification:[self coalescedNotificationForRequest:req]];
     else [self.clvc insertNotificationRequest:req];
     self.clvc.axnAllowChanges = NO;
 }
@@ -416,7 +416,7 @@
     if (!req) return;
     self.clvc.axnAllowChanges = YES;
     [self insertNotificationRequest:req];
-    if ([self.clvc respondsToSelector:@selector(removeNotificationRequest:forCoalescedNotification:)]) [self.clvc removeNotificationRequest:req forCoalescedNotification:[self coalescedNotificationForRequest:req]];
+    if ([(id)self.clvc respondsToSelector:@selector(removeNotificationRequest:forCoalescedNotification:)]) [self.clvc removeNotificationRequest:req forCoalescedNotification:[self coalescedNotificationForRequest:req]];
     else [self.clvc removeNotificationRequest:req];
     self.clvc.axnAllowChanges = NO;
 
