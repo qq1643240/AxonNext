@@ -40,7 +40,7 @@ jobs:
         id: cache-theos
         with:
           path: /opt/theos
-          key: theos-${{ matrix.scheme }}-v2
+          key: theos-${{ matrix.scheme }}-v3-sdk
 
       - name: Install Theos (rootless)
         if: steps.cache-theos.outputs.cache-hit != 'true' && matrix.scheme == 'rootless'
@@ -50,6 +50,12 @@ jobs:
           git clone --recursive https://github.com/theos/theos.git /opt/theos
           mkdir -p /opt/theos/toolchain/linux/iphone
           cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid
+          # Download iOS SDK
+          cd /tmp
+          curl -sL "https://github.com/chrjguill/iOS-SDKs/raw/master/iPhoneOS16.5.sdk.tar.xz" -o iPhoneOS16.5.sdk.tar.xz
+          mkdir -p /opt/theos/sdks
+          tar -xf iPhoneOS16.5.sdk.tar.xz -C /opt/theos/sdks
+          ls /opt/theos/sdks/
 
       - name: Install Theos (roothide)
         if: steps.cache-theos.outputs.cache-hit != 'true' && matrix.scheme == 'roothide'
@@ -60,6 +66,12 @@ jobs:
           git clone --recursive https://github.com/roothide/Theos.git /opt/theos
           mkdir -p /opt/theos/toolchain/linux/iphone
           cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid
+          # Download iOS SDK
+          cd /tmp
+          curl -sL "https://github.com/chrjguill/iOS-SDKs/raw/master/iPhoneOS16.5.sdk.tar.xz" -o iPhoneOS16.5.sdk.tar.xz
+          mkdir -p /opt/theos/sdks
+          tar -xf iPhoneOS16.5.sdk.tar.xz -C /opt/theos/sdks
+          ls /opt/theos/sdks/
 
       - name: Setup Theos environment
         run: |
