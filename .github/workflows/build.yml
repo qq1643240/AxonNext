@@ -27,15 +27,19 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential fakeroot dpkg-dev ldid perl \
+          sudo apt-get install -y build-essential fakeroot dpkg-dev perl \
             rsync curl wget git unzip
+          # Install ldid from alternative source (not in Ubuntu 24.04 repos)
+          curl -sL https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_linux_x86_64 -o /tmp/ldid
+          sudo install -m755 /tmp/ldid /usr/local/bin/ldid
+          ldid --version || true
 
       - name: Cache Theos
         uses: actions/cache@v4
         id: cache-theos
         with:
           path: /opt/theos
-          key: theos-${{ runner.os }}-${{ hashFiles('.github/workflows/build.yml') }}
+          key: theos-ubuntu24-${{ hashFiles('.github/workflows/build.yml') }}
 
       - name: Install Theos
         if: steps.cache-theos.outputs.cache-hit != 'true'
@@ -43,6 +47,10 @@ jobs:
           sudo mkdir -p /opt/theos
           sudo chown -R $USER /opt/theos
           git clone --recursive https://github.com/theos/theos.git /opt/theos
+          # Place ldid where Theos expects it
+          cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid 2>/dev/null || true
+          mkdir -p /opt/theos/toolchain/linux/iphone
+          cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid 2>/dev/null || true
 
       - name: Setup Theos environment
         run: |
