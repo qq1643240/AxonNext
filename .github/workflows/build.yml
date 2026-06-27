@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential fakeroot dpkg-dev perl \
-            rsync curl wget git unzip xz-utils
+            rsync curl wget git unzip xz-utils lzma
 
       - name: Install ldid
         run: |
@@ -41,18 +41,29 @@ jobs:
           sudo chown -R $USER /opt/theos
           # Clone Theos
           git clone --recursive https://github.com/theos/theos.git /opt/theos
-          # Install toolchain
+          # Install toolchain from sbingner/llvm-project
           mkdir -p /opt/theos/toolchain/linux/iphone
-          curl -sL "https://github.com/theos/toolchain/releases/latest/download/toolchain_linux_x86_64.tar.xz" -o /tmp/toolchain.tar.xz
-          tar -xf /tmp/toolchain.tar.xz -C /opt/theos/toolchain/linux/iphone
-          # Install ldid into toolchain
+          curl -sL "https://github.com/sbingner/llvm-project/releases/download/v10.0.0-2/linux-ios-arm64e-clang-toolchain.tar.lzma" -o /tmp/toolchain.tar.lzma
+          cd /tmp && lzma -d toolchain.tar.lzma && tar -xf toolchain.tar -C /opt/theos/toolchain/linux/iphone
+          # Install ldid into toolchain bin
           cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/bin/ldid 2>/dev/null || true
           # Install SDK
           mkdir -p /opt/theos/sdks
-          curl -sL "https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz" -o /tmp/sdk.tar.xz
-          tar -xf /tmp/sdk.tar.xz -C /opt/theos/sdks
+          git clone --depth 1 https://github.com/theos/sdks.git /tmp/sdks
+          if [ -d "/tmp/sdks/iPhoneOS16.5.sdk" ]; then
+            cp -r /tmp/sdks/iPhoneOS16.5.sdk /opt/theos/sdks/
+          else
+            curl -sL "https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz" -o /tmp/sdk.tar.xz && \
+            tar -xf /tmp/sdk.tar.xz -C /opt/theos/sdks/ || true
+          fi
+          # Fallback: try iPhoneOS14.5 SDK if 16.5 not found
+          if [ ! -d "/opt/theos/sdks/iPhoneOS16.5.sdk" ]; then
+            curl -sL "https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz" -o /tmp/sdk2.tar.xz && \
+            tar -xf /tmp/sdk2.tar.xz -C /opt/theos/sdks/ || true
+          fi
           echo "=== Theos tree ==="
           ls /opt/theos/toolchain/linux/iphone/bin/ | head -10
+          echo "=== SDKs ==="
           ls /opt/theos/sdks/
 
       - name: Install Theos with toolchain (roothide)
@@ -62,18 +73,34 @@ jobs:
           sudo chown -R $USER /opt/theos
           # Clone roothide Theos fork
           git clone --recursive https://github.com/roothide/Theos.git /opt/theos
-          # Install toolchain
+          # Install toolchain from sbingner/llvm-project
           mkdir -p /opt/theos/toolchain/linux/iphone
-          curl -sL "https://github.com/theos/toolchain/releases/latest/download/toolchain_linux_x86_64.tar.xz" -o /tmp/toolchain.tar.xz
-          tar -xf /tmp/toolchain.tar.xz -C /opt/theos/toolchain/linux/iphone
+          curl -sL "https://github.com/sbingner/llvm-project/releases/download/v10.0.0-2/linux-ios-arm64e-clang-toolchain.tar.lzma" -o /tmp/toolchain.tar.lzma
+          cd /tmp && lzma -d toolchain.tar.lzma && tar -xf toolchain.tar -C /opt/theos/toolchain/linux/iphone
+          # Install ldid into toolchain bin
           cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/bin/ldid 2>/dev/null || true
           # Install SDK
           mkdir -p /opt/theos/sdks
-          curl -sL "https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz" -o /tmp/sdk.tar.xz
-          tar -xf /tmp/sdk.tar.xz -C /opt/theos/sdks
+          git clone --depth 1 https://github.com/theos/sdks.git /tmp/sdks
+          if [ -d "/tmp/sdks/iPhoneOS16.5.sdk" ]; then
+            cp -r /tmp/sdks/iPhoneOS16.5.sdk /opt/theos/sdks/
+          else
+            curl -sL "https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz" -o /tmp/sdk.tar.xz && \
+            tar -xf /tmp/sdk.tar.xz -C /opt/theos/sdks/ || true
+          fi
+          if [ ! -d "/opt/theos/sdks/iPhoneOS16.5.sdk" ]; then
+            curl -sL "https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz" -o /tmp/sdk2.tar.xz && \
+            tar -xf /tmp/sdk2.tar.xz -C /opt/theos/sdks/ || true
+          fi
           echo "=== Theos tree ==="
           ls /opt/theos/toolchain/linux/iphone/bin/ | head -10
+          echo "=== SDKs ==="
           ls /opt/theos/sdks/
+
+      - name: Setup Theos environment
+        run: |
+          echo "THEOS=/opt/theos" >> $GITHUB_ENV
+          echo "THEOS_PACKAGE_SCHEME=${{ matrix.scheme }}" >> $GITHUB_ENV
 
       - name: Build Tweak
         run: |
@@ -86,27 +113,24 @@ jobs:
 
       - name: List built packages
         run: |
-          find . -name "*.deb" -type f
-          ls -la packages/ 2>/dev/null || true
+          ls -la packages/ 2>/dev/null || echo "No packages directory"
+          find . -name "*.deb" -exec ls -la {} \;
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: AxonNext-${{ matrix.scheme }}
           path: |
-            **/*.deb
             packages/*.deb
+          if-no-files-found: error
 
   release:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.ref == 'refs/heads/main'
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
@@ -116,18 +140,19 @@ jobs:
         run: |
           mkdir -p release
           find artifacts -name "*.deb" -exec cp {} release/ \;
-          # Rename for clarity
-          cd release
-          for f in *.deb; do
-            if [ -f "$f" ]; then
-              mv "$f" "AxonNext_$(echo $f | sed 's/\.deb//' | tr '[:upper:]' '[:lower:]').deb" 2>/dev/null || true
+          # Rename debs
+          for f in release/*.deb; do
+            if echo "$f" | grep -q rootless; then
+              cp "$f" release/AxonNext_rootless.deb
+            elif echo "$f" | grep -q roothide; then
+              cp "$f" release/AxonNext_roothide.deb
             fi
           done
-          ls -la release/ 2>/dev/null || ls -la
+          ls -la release/
 
-      - name: Delete existing release
+      - name: Delete existing release if any
         run: |
-          gh release delete v2.0 --yes 2>/dev/null || true
+          gh release delete v2.0 2>/dev/null || true
           git push --delete origin v2.0 2>/dev/null || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
