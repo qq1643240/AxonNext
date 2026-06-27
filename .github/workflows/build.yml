@@ -40,7 +40,7 @@ jobs:
         id: cache-theos
         with:
           path: /opt/theos
-          key: theos-${{ matrix.scheme }}-v3-sdk
+          key: theos-${{ matrix.scheme }}-v4-sdk
 
       - name: Install Theos (rootless)
         if: steps.cache-theos.outputs.cache-hit != 'true' && matrix.scheme == 'rootless'
@@ -50,11 +50,15 @@ jobs:
           git clone --recursive https://github.com/theos/theos.git /opt/theos
           mkdir -p /opt/theos/toolchain/linux/iphone
           cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid
-          # Download iOS SDK
-          cd /tmp
-          curl -sL "https://github.com/chrjguill/iOS-SDKs/raw/master/iPhoneOS16.5.sdk.tar.xz" -o iPhoneOS16.5.sdk.tar.xz
+          # Download iOS SDK from theos/sdks
           mkdir -p /opt/theos/sdks
-          tar -xf iPhoneOS16.5.sdk.tar.xz -C /opt/theos/sdks
+          cd /tmp
+          git clone https://github.com/theos/sdks.git /tmp/sdks
+          cp -r /tmp/sdks/iPhoneOS16.5.sdk /opt/theos/sdks/ || \
+          ( curl -sL "https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz" -o sdk.tar.xz && \
+            tar -xf sdk.tar.xz -C /opt/theos/sdks/ ) || \
+          ( curl -sL "https://github.com/xybp888/iOS-SDKs/raw/master/iPhoneOS16.5.sdk.tar.xz" -o sdk.tar.xz && \
+            tar -xf sdk.tar.xz -C /opt/theos/sdks/ )
           ls /opt/theos/sdks/
 
       - name: Install Theos (roothide)
@@ -67,10 +71,14 @@ jobs:
           mkdir -p /opt/theos/toolchain/linux/iphone
           cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid
           # Download iOS SDK
-          cd /tmp
-          curl -sL "https://github.com/chrjguill/iOS-SDKs/raw/master/iPhoneOS16.5.sdk.tar.xz" -o iPhoneOS16.5.sdk.tar.xz
           mkdir -p /opt/theos/sdks
-          tar -xf iPhoneOS16.5.sdk.tar.xz -C /opt/theos/sdks
+          cd /tmp
+          git clone https://github.com/theos/sdks.git /tmp/sdks
+          cp -r /tmp/sdks/iPhoneOS16.5.sdk /opt/theos/sdks/ || \
+          ( curl -sL "https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz" -o sdk.tar.xz && \
+            tar -xf sdk.tar.xz -C /opt/theos/sdks/ ) || \
+          ( curl -sL "https://github.com/xybp888/iOS-SDKs/raw/master/iPhoneOS16.5.sdk.tar.xz" -o sdk.tar.xz && \
+            tar -xf sdk.tar.xz -C /opt/theos/sdks/ )
           ls /opt/theos/sdks/
 
       - name: Setup Theos environment
