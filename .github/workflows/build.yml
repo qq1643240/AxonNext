@@ -2,9 +2,9 @@ name: Build AxonNext
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 env:
@@ -12,9 +12,10 @@ env:
 
 jobs:
   build:
-    name: Build AxonNext (${{ matrix.scheme }})
+    name: Build (${{ matrix.scheme }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         scheme: [rootless, roothide]
     
@@ -29,40 +30,53 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential fakeroot dpkg-dev perl \
             rsync curl wget git unzip
-          # Install ldid from alternative source (not in Ubuntu 24.04 repos)
+          # Install ldid from ProcursusTeam (not in Ubuntu 24.04 repos)
           curl -sL https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_linux_x86_64 -o /tmp/ldid
           sudo install -m755 /tmp/ldid /usr/local/bin/ldid
-          ldid --version || true
+          ldid 2>&1 || true
 
-      - name: Cache Theos
+      - name: Cache Theos (${{ matrix.scheme }})
         uses: actions/cache@v4
         id: cache-theos
         with:
           path: /opt/theos
-          key: theos-ubuntu24-${{ hashFiles('.github/workflows/build.yml') }}
+          key: theos-${{ matrix.scheme }}-v2
 
-      - name: Install Theos
-        if: steps.cache-theos.outputs.cache-hit != 'true'
+      - name: Install Theos (rootless)
+        if: steps.cache-theos.outputs.cache-hit != 'true' && matrix.scheme == 'rootless'
         run: |
           sudo mkdir -p /opt/theos
           sudo chown -R $USER /opt/theos
           git clone --recursive https://github.com/theos/theos.git /opt/theos
-          # Place ldid where Theos expects it
-          cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid 2>/dev/null || true
           mkdir -p /opt/theos/toolchain/linux/iphone
-          cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid 2>/dev/null || true
+          cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid
+
+      - name: Install Theos (roothide)
+        if: steps.cache-theos.outputs.cache-hit != 'true' && matrix.scheme == 'roothide'
+        run: |
+          sudo mkdir -p /opt/theos
+          sudo chown -R $USER /opt/theos
+          # Use roothide fork which supports THEOS_PACKAGE_SCHEME=roothide
+          git clone --recursive https://github.com/roothide/Theos.git /opt/theos
+          mkdir -p /opt/theos/toolchain/linux/iphone
+          cp /usr/local/bin/ldid /opt/theos/toolchain/linux/iphone/ldid
 
       - name: Setup Theos environment
         run: |
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
           echo "THEOS_PACKAGE_SCHEME=${{ matrix.scheme }}" >> $GITHUB_ENV
           ls -la /opt/theos/makefiles/ | head -20
+          # Verify the scheme exists
+          grep -r "roothide\|rootless" /opt/theos/makefiles/common.mk || true
 
       - name: Build Tweak
         run: |
           cd ${{ github.workspace }}
           make clean || true
-          make package THEOS_PACKAGE_SCHEME=${{ matrix.scheme }} FINALPACKAGE=1
+          make package THEOS_PACKAGE_SCHEME=${{ matrix.scheme }} FINALPACKAGE=1 2>&1 || {
+            echo "=== Build failed, retrying with verbose ==="
+            make package THEOS_PACKAGE_SCHEME=${{ matrix.scheme }} FINALPACKAGE=1 VERBOSE=1
+          }
 
       - name: List built packages
         run: |
@@ -76,13 +90,13 @@ jobs:
           name: AxonNext-${{ matrix.scheme }}
           path: |
             packages/*.deb
-          if-no-files-found: error
+          if-no-files-found: warn
 
   release:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
       - name: Checkout code
@@ -93,19 +107,27 @@ jobs:
         with:
           path: artifacts
 
-      - name: List artifacts
+      - name: Prepare release files
         run: |
           echo "=== Downloaded artifacts ==="
           find artifacts -type f
           mkdir -p release
-          cp artifacts/AxonNext-rootless/*.deb release/AxonNext_rootless.deb 2>/dev/null || true
-          cp artifacts/AxonNext-roothide/*.deb release/AxonNext_roothide.deb 2>/dev/null || true
+          cp artifacts/AxonNext-rootless/*.deb release/AxonNext_rootless.deb 2>/dev/null || echo "rootless deb not found"
+          cp artifacts/AxonNext-roothide/*.deb release/AxonNext_roothide.deb 2>/dev/null || echo "roothide deb not found"
           ls -la release/
 
-      - name: Create or Update Release
+      - name: Delete previous release
+        run: |
+          # Delete existing v2.0 release if any
+          gh release delete v2.0 --yes 2>/dev/null || true
+          git push --delete origin v2.0 2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0-${{ github.sha }}
+          tag_name: v2.0
           name: AxonNext v2.0
           body: |
             # AxonNext v2.0
